@@ -1,0 +1,7 @@
+*.asv
+output
+data
+doc
+manuscript
+*.pptx
+src/.ipynb_checkpoints
