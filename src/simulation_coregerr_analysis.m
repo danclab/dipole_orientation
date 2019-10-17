@@ -5,13 +5,9 @@ function simulation_coregerr_analysis(subj_info, varargin)
 % Simulates dipole at orientation given by link vectors, inverts at
 % orientation 0-70 deg away
 %%
-%addpath('/mnt/data/maxime/dipole_moment_priors/spm12')
-% % % defaults = struct('base_dir','../data',...
-% % %     'surf_dir', '../../beta_burst_layers/data/surf',...
-% % %     'mri_dir', '../../beta_burst_layers/data/mri');  %define default values
 defaults = struct('base_dir','../data',...
-    'surf_dir', '../data/surf',...
-    'mri_dir', '../data/mri');  %define default values
+    'surf_dir', '../../beta_burst_layers/data/surf',...
+    'mri_dir', '../../beta_burst_layers/data/mri');  %define default values
 params = struct(varargin{:});
 for f = fieldnames(defaults)',  
     if ~isfield(params, f{1}),
@@ -42,8 +38,7 @@ if exist(fullfile(subj_surf_dir,'FWHM5.00_pial.ds.mat'),'file')==2
 end
 
 % Coregistration error levels to simulate at
-%coregerr_levels=[0:.1:1];
-coregerr_levels=[.1:.1:1];
+coregerr_levels=[0:.1:1];
 
 % Randomize simulation vertices
 nverts=size(ds_pial.vertices,1);
@@ -51,7 +46,7 @@ rng('default');
 rng(0);
 simvertind=randperm(nverts);
 % Number of locations to simulate at
-n_sim_locations=1;
+n_sim_locations=100;
 
 orig_fid=[subj_info.nas; subj_info.lpa; subj_info.rpa];
 meanfid=mean(orig_fid);
