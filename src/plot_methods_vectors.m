@@ -8,7 +8,7 @@ for f = fieldnames(defaults)',
     end
 end
 
-methods={'ds_surf_norm','orig_surf_norm','link_vector','fs_anat_link'};
+methods={'ds_surf_norm','orig_surf_norm','link_vector','variational'};
 
 pial=gifti(fullfile(params.surf_dir, sprintf('%s-synth',subj_info.subj_id), 'surf/pial.ds.gii'));
 wm=gifti(fullfile(params.surf_dir, sprintf('%s-synth',subj_info.subj_id), 'surf/white.ds.gii'));
