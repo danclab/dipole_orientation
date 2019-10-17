@@ -63,34 +63,8 @@ switch method
             'vertices',ds_surface.vertices),true);
         z=find(sum(norm,2)==0);
         norm(z,:)=norm2(z,:);
-%     case 'anat_link'
-%         orig_surface=gifti(fullfile(surf_dir, 'pial.gii'));
-%         pial_idx=knnsearch(orig_surface.vertices,ds_surface.vertices);
-%         lh_smoothed_normals_coords=dlmread(fullfile(surf_dir, 'lh.smoothed_normals_coords.txt'));
-%         rh_smoothed_normals_coords=dlmread(fullfile(surf_dir, 'rh.smoothed_normals_coords.txt'));
-%         all_smoothed_normals_coords=[lh_smoothed_normals_coords; rh_smoothed_normals_coords];
-%          
-%         lh_smoothed_origin_coords=dlmread(fullfile(surf_dir,'lh.smoothed_orig_coords.txt'));
-%         rh_smoothed_origin_coords=dlmread(fullfile(surf_dir,'rh.smoothed_orig_coords.txt'));
-%         all_smoothed_origin_coords=[lh_smoothed_origin_coords; rh_smoothed_origin_coords];
-%          
-%         origin_idx=knnsearch(all_smoothed_origin_coords,orig_surface.vertices);
-%         all_smoothed_origin_coords=all_smoothed_origin_coords(origin_idx,:);
-%         all_smoothed_normals_coords=all_smoothed_normals_coords(origin_idx,:);
-%          
-%         norm=all_smoothed_normals_coords-all_smoothed_origin_coords;
-%         norm=norm(pial_idx,:);
-%         normN = sqrt(sum(norm.^2,2));
-%         bad_idx=find(normN < eps);
-%         normN(bad_idx)=1;
-%         norm = bsxfun(@rdivide,norm,normN);
-%         norm=double(norm);
-%          
-%         % Replace where 0 with face normal
-%         norm2 = spm_mesh_normals(struct('faces',ds_surface.faces,'vertices',ds_surface.vertices),true);
-%         z=find(sum(norm,2)==0);
-%         norm(z,:)=norm2(z,:); 
-    case 'fs_anat_link'
+
+    case 'variational'
         if strcmp(surface, 'white-pial')
             ds_white=gifti(fullfile(surf_dir, 'white.ds.gii'));
             orig_white=gifti(fullfile(surf_dir, 'white.gii'));
