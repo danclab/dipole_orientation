@@ -9,7 +9,7 @@ for f = fieldnames(defaults)',
     end
 end
 
-methods={'ds_surf_norm','orig_surf_norm','link_vector','fs_anat_link'};
+methods={'ds_surf_norm','orig_surf_norm','link_vector','variational'};
 fvals=[];
 f_idx=1;
 
