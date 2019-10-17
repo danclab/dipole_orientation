@@ -8,7 +8,7 @@ for f = fieldnames(defaults)',
     end
 end
 
-methods={'ds_surf_norm','orig_surf_norm','fs_anat_link'};
+methods={'ds_surf_norm','orig_surf_norm','variational'};
 
 pial_vectors={};
 white_vectors={};
@@ -58,12 +58,15 @@ for method_idx=1:length(methods)
             y=method_white_vectors(i,:);
             %angle_diff(i)=radtodeg(2 * atan(norm(x*norm(y) - norm(x)*y) / norm(x * norm(y) + norm(x) * y)));
             angle_diff(i)=atan2d(norm(cross(x,y)),dot(x,y));
+            if angle_diff(i)>90
+                angle_diff(i)=180-angle_diff(i);
+            end
         end
         [f,xi] = ksdensity(angle_diff,linspace(0,180));
         plot(xi,f,'Color',c(subj_idx,:),'LineWidth',2);
         plot(ones(1,2).*nanmean(angle_diff), ylim(), '--', 'Color', c(subj_idx,:),'HandleVisibility','off');
         disp(sprintf('Method %s, subject %d, M=%.3f, SD=%.3f', methods{method_idx}, subj_idx, nanmean(angle_diff), nanstd(angle_diff)))
-        xlim([0 180]);
+        xlim([0 90]);
         title(methods{method_idx});
         subj_mean_diffs(end+1)=nanmean(angle_diff);
     end
