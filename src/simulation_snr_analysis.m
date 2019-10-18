@@ -38,7 +38,6 @@ if exist(fullfile(subj_surf_dir,'FWHM5.00_pial.ds.mat'),'file')==2
 end
 
 % SNR levels to simulate at
-%snr_levels=[-100 -50 -20 -10 -5 0 5];
 snr_levels=[-50 -40 -30 -20 -10 0];
 
 % Randomize simulation vertices
@@ -47,10 +46,9 @@ rng('default');
 rng(0);
 simvertind=randperm(nverts);
 % Number of locations to simulate at
-n_sim_locations=1;
+n_sim_locations=100;
 
 % For each simulation location
-%for v_idx=3:3
 for v_idx=1:n_sim_locations    
     % Get vertex and normal vector
     sim_vertex=simvertind(v_idx);
