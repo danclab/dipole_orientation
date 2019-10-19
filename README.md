@@ -1,5 +1,7 @@
 Analysis code for Bonaiuto, et al "Estimates of cortical column orientation improve MEG source inversion"
 
+https://www.biorxiv.org/content/10.1101/810267v1
+
 Requirements:
 
 * SPM12 (replace spm_eeg_lgainmat.m and spm_eeg_simulate.m): https://www.fil.ion.ucl.ac.uk/spm/software/spm12/
