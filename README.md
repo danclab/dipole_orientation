@@ -6,3 +6,4 @@ Requirements:
 * shadedErrorBar: https://fr.mathworks.com/matlabcentral/fileexchange/26311-raacampbell-shadederrorbar?
 * dict: http://uk.mathworks.com/matlabcentral/fileexchange/19381-lookuptable
 * rodrigues_rot: https://fr.mathworks.com/matlabcentral/fileexchange/34426-rotate-vector-s-about-axis
+* nibabel
