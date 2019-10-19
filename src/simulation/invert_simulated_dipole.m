@@ -1,7 +1,7 @@
 function f_val=invert_simulated_dipole(subj_info, surf_name, oris, varargin)
 
-defaults = struct('base_dir','../data',...
-    'surf_dir', '../data/surf', 'mri_dir', '../data/mri',...
+defaults = struct('base_dir','../../data',...
+    'surf_dir', '../../data/surf', 'mri_dir', '../data/mri',...
     'patch_size', 5, 'n_temp_modes', 4, 'method', 'EBB');  %define default values
 params = struct(varargin{:});
 for f = fieldnames(defaults)',  
@@ -11,11 +11,11 @@ for f = fieldnames(defaults)',
 end
 
 % Where to put output data
-data_dir=fullfile('../output/data',subj_info.subj_id,'sim');
+data_dir=fullfile('../../output/data',subj_info.subj_id,'sim');
 mkdir(data_dir);
 
 % Data file to load
-data_file=fullfile('../output/data',subj_info.subj_id,'sim', 'msim_pial_prcresp_TafdfC.mat');
+data_file=fullfile('../../output/data',subj_info.subj_id,'sim', 'msim_pial_prcresp_TafdfC.mat');
 
 % Subject surfaces
 subj_surf_dir=fullfile(params.surf_dir, sprintf('%s-synth',...

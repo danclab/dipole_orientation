@@ -2,8 +2,8 @@ function plot_coregerr_sims(subj_info, varargin)
 % % % defaults = struct('base_dir','../data',...
 % % %     'surf_dir', '../../beta_burst_layers/data/surf',...
 % % %     'mri_dir', '../../beta_burst_layers/data/mri');  %define default values
-defaults = struct('base_dir','../data',...
-    'surf_dir', '../data/surf');  %define default values
+defaults = struct('base_dir','../../data',...
+    'surf_dir', '../../data/surf');  %define default values
 params = struct(varargin{:});
 for f = fieldnames(defaults)',  
     if ~isfield(params, f{1}),
@@ -14,7 +14,7 @@ end
 spm('defaults', 'EEG');
 spm_jobman('initcfg');
 
-output_dir='../output/data/sim';
+output_dir='../../output/data/sim';
 
 files=ls(fullfile(output_dir,sprintf('sim_%s*coreg*.mat',subj_info.subj_id)));
 simvertind=[];
@@ -32,15 +32,8 @@ subj_surf_dir=fullfile(params.surf_dir, sprintf('%s-synth', subj_info.subj_id), 
 ds_pial=gifti(fullfile(subj_surf_dir, 'pial.ds.gii'));
 
 % Coregistration error levels to simulate at
-%coregerr_levels=[0:.1:1];
 coregerr_levels=[0.0 0.2 0.4 0.6 0.8 1.0];
-%coregerr_levels=[1:9];
 
-% Randomize simulation vertices
-nverts=size(ds_pial.vertices,1);
-rng('default');
-rng(0);
-%simvertind=randperm(nverts);
 % Number of locations to simulate at
 n_sim_locations=100;
 
@@ -54,8 +47,7 @@ for v_idx=1:n_sim_locations
     for c_idx=1:length(coregerr_levels)
         coregerr=coregerr_levels(c_idx);
                 
-        % Invert at 10 different orientations
-        %for ori_idx=1:10
+        % 10 different orientations
         for ori_idx=1:10
             load(fullfile(output_dir, sprintf('sim_%s_vertex_%d_ori_idx_%d_coregerr_%d.mat',...
                 subj_info.subj_id, sim_vertex, ori_idx, coregerr)));

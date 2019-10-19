@@ -1,13 +1,13 @@
-function simulation_snr_analysis(subj_info, varargin)
+function simulation_coregerr_analysis(subj_info, varargin)
 %%
-% Runs simulations at random source locations with different SNR levels.
+% Runs simulations at random source locations with different coregistration
+% error levels.
 % Simulates dipole at orientation given by link vectors, inverts at
 % orientation 0-70 deg away
 %%
-%addpath('/mnt/data/maxime/dipole_moment_priors/spm12')
-defaults = struct('base_dir','../data',...
-    'surf_dir', '../data/surf',...
-    'mri_dir', '../data/mri');  %define default values
+defaults = struct('base_dir','../../data',...
+    'surf_dir', '../../../beta_burst_layers/data/surf',...
+    'mri_dir', '../../../beta_burst_layers/data/mri');  %define default values
 params = struct(varargin{:});
 for f = fieldnames(defaults)',  
     if ~isfield(params, f{1}),
@@ -16,10 +16,11 @@ for f = fieldnames(defaults)',
 end
 
 spm('defaults', 'EEG');
-spm_jobman('initcfg'); 
+spm_jobman('initcfg');
 spm('CmdLine');
+addpath('..');
 
-output_dir='../output/data/sim';
+output_dir='../../output/data/sim';
 mkdir(output_dir);
 
 % Get downsampled pial surface
@@ -37,8 +38,8 @@ if exist(fullfile(subj_surf_dir,'FWHM5.00_pial.ds.mat'),'file')==2
         fullfile(subj_surf_dir,sprintf('FWHM5.00_pial.ds.%s.mat',method)));
 end
 
-% SNR levels to simulate at
-snr_levels=[-50 -40 -30 -20 -10 0];
+% Coregistration error levels to simulate at
+coregerr_levels=[0:.1:1];
 
 % Randomize simulation vertices
 nverts=size(ds_pial.vertices,1);
@@ -48,20 +49,43 @@ simvertind=randperm(nverts);
 % Number of locations to simulate at
 n_sim_locations=100;
 
+orig_fid=[subj_info.nas; subj_info.lpa; subj_info.rpa];
+meanfid=mean(orig_fid);
+zeromeanfid=[orig_fid-repmat(meanfid,3,1) ones(3,1)];
+        
 % For each simulation location
-for v_idx=1:n_sim_locations    
+for v_idx=1:n_sim_locations
     % Get vertex and normal vector
     sim_vertex=simvertind(v_idx);
     sim_ori=ds_pial.normals(sim_vertex, :);
     
-    % For each SNR level
-    for snr_idx=1:length(snr_levels)
-        snr=snr_levels(snr_idx);
+    % Run simulation
+    sim_signal=simulate_dipole(subj_info, method_fname, sim_vertex, sim_ori, 0,...
+        'base_dir', params.base_dir, 'surf_dir', params.surf_dir,...
+        'mri_dir', params.mri_dir, 'new_coreg', true);
+
+    % For each coregistration error level
+    for c_idx=1:length(coregerr_levels)
+        coregerr=coregerr_levels(c_idx);
+             
+        % Create translation vector
+        translation=coregerr;
+        shift_vec=randn(1,3);
+        shift_vec=shift_vec./sqrt(sum(shift_vec.^2)).*translation;
         
-        % Run simulation
-        sim_signal=simulate_dipole(subj_info, method_fname, sim_vertex, sim_ori, snr,...
-            'base_dir', params.base_dir, 'surf_dir', params.surf_dir,...
-            'mri_dir', params.mri_dir);
+        % Create rotation vector
+        rotation_rad=coregerr*10*pi/180.0;
+        rot_vec=randn(1,3);
+        rot_vec=rot_vec./sqrt(sum(rot_vec.^2)).*rotation_rad;
+        
+        % Apply transformation to fiducial locations
+        P=[shift_vec rot_vec];
+        [A]=spm_matrix(P);
+        fid=(A*zeromeanfid')';
+        fid=fid(:,1:3)+repmat(meanfid,3,1);
+        subj_info.nas=fid(1,:);
+        subj_info.lpa=fid(2,:);
+        subj_info.rpa=fid(3,:);
 
         % Invert at 10 different orientations
         for ori_idx=1:10
@@ -87,22 +111,22 @@ for v_idx=1:n_sim_locations
             
             % Run inversion and get free energy
             fval=invert_simulated_dipole(subj_info, method_fname,...
-                new_normals, 'base_dir',params.base_dir, 'surf_dir', params.surf_dir,...
-                'mri_dir',params.mri_dir);
-                        
+                new_normals, 'base_dir',params.base_dir,...
+                'surf_dir', params.surf_dir, 'mri_dir',params.mri_dir);
+            
             % Save results
             results=[];
             results.sim_vertex=sim_vertex;
             results.subj_info=subj_info;
             results.sim_ori=sim_ori;
-            results.snr=snr;
+            results.coregerr=coregerr;
             results.sim_signal=sim_signal;
             results.method=method;
             results.inv_ori=new_ori;
             results.angle_diff=angle_diff;
             results.F=fval;
-            save(fullfile(output_dir, sprintf('sim_%s_vertex_%d_ori_idx_%d_snr_%d.mat',...
-                subj_info.subj_id, sim_vertex, ori_idx, snr)),'results');
+            save(fullfile(output_dir, sprintf('sim_%s_vertex_%d_ori_idx_%d_coregerr_%d.mat',...
+                subj_info.subj_id, sim_vertex, ori_idx, coregerr)),'results');
         end
     end
 end

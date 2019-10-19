@@ -1,9 +1,6 @@
 function plot_snr_sims(subj_info, varargin)
-% % % defaults = struct('base_dir','../data',...
-% % %     'surf_dir', '../../beta_burst_layers/data/surf',...
-% % %     'mri_dir', '../../beta_burst_layers/data/mri');  %define default values
-defaults = struct('base_dir','../data',...
-    'surf_dir', '../data/surf');  %define default values
+defaults = struct('base_dir','../../data',...
+    'surf_dir', '../../data/surf');  %define default values
 params = struct(varargin{:});
 for f = fieldnames(defaults)',  
     if ~isfield(params, f{1}),
@@ -14,7 +11,7 @@ end
 spm('defaults', 'EEG');
 spm_jobman('initcfg');
 
-output_dir='../output/data/sim';
+output_dir='../../output/data/sim';
 
 % Get downsampled pial surface
 subj_surf_dir=fullfile(params.surf_dir, sprintf('%s-synth', subj_info.subj_id), 'surf');

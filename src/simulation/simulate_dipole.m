@@ -3,9 +3,9 @@ function sim_signal=simulate_dipole(subj_info, surf_name, sim_vertex, ori, SNRdB
 % Simulates a dipole at the given location, orientation, and SNR level
 %%
 
-defaults = struct('base_dir','../data',...
-    'surf_dir', '../../beta_burst_layers/data/surf',...
-    'mri_dir', '../../beta_burst_layers/data/mri');  %define default values
+defaults = struct('base_dir','../../data',...
+    'surf_dir', '../../../beta_burst_layers/data/surf',...
+    'mri_dir', '../../../beta_burst_layers/data/mri');  %define default values
 params = struct(varargin{:});
 for f = fieldnames(defaults)',  
     if ~isfield(params, f{1}),
@@ -17,7 +17,7 @@ spm('defaults', 'EEG');
 spm_jobman('initcfg'); 
 
 % Where to put output data
-data_dir=fullfile('../output/data',subj_info.subj_id,'sim');
+data_dir=fullfile('../../output/data',subj_info.subj_id,'sim');
 mkdir(data_dir);
 
 % Data file to load
