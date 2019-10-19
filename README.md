@@ -12,6 +12,7 @@ Requirements:
 
 
 Use
+
     normals=compute_surface_normals(subjects_dir, subj_id, surface, method)
 where surface is 'pial', 'white', or 'white-pial' (combined surface), and method is 'ds_surf_norm', 'orig_surf_norm', 'link_vector', or 'variational'.
 
