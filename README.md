@@ -9,3 +9,10 @@ Requirements:
 * dict: http://uk.mathworks.com/matlabcentral/fileexchange/19381-lookuptable
 * rodrigues_rot: https://fr.mathworks.com/matlabcentral/fileexchange/34426-rotate-vector-s-about-axis
 * nibabel
+
+
+Use
+    normals=compute_surface_normals(subjects_dir, subj_id, surface, method)
+where surface is 'pial', 'white', or 'white-pial' (combined surface), and method is 'ds_surf_norm', 'orig_surf_norm', 'link_vector', or 'variational'.
+
+Then set the 'normals' attribute of the gifti surface you want to use for inversion using the result. spm_eeg_lgainmat.m will use this attribute if it exists, rather than computing surface normals. If it does not exist, normals will be computed as usual using spm_mesh_normals.m
