@@ -78,6 +78,23 @@ catch
             norm = spm_mesh_normals(struct('faces',face,'vertices',vert),true);
         end                      
 
+        if forward(ind).loc
+            % Double number of vertices
+            vert=[vert;vert];
+
+            head_center=mean(vert,1);
+            % Generate exta orientations per vertices by taking cross product
+            % with vector to head-center
+            norm2=zeros(size(norm));
+            for j=1:size(norm,1), %% over vertices
+                radvec=vert(j,:) - head_center;
+                ravec=radvec./sqrt(dot(radvec,radvec)); % unit vector
+                norm2(j,:)=cross(norm(j,:),ravec);
+                norm2(j,:)=norm2(j,:)./sqrt(dot(norm2(j,:),norm2(j,:)));
+            end
+            norm=[norm;norm2];
+        end
+        
         vol  = forward(ind).vol;
         
         if ischar(vol)
