@@ -1,6 +1,6 @@
 function plot_vector_comparison(subjects, surface, varargin)
 
-defaults = struct('surf_dir', '../../beta_burst_layers/data/surf','mpm_surfs',true);  %define default values
+defaults = struct('surf_dir', '../../../inProgress/beta_burst_layers/data/surf','mpm_surfs',true);  %define default values
 params = struct(varargin{:});
 for f = fieldnames(defaults)',  
     if ~isfield(params, f{1}),
@@ -8,7 +8,7 @@ for f = fieldnames(defaults)',
     end
 end
 
-methods={'ds_surf_norm','orig_surf_norm','link_vector','variational'};
+methods={'ds_surf_norm','cps','orig_surf_norm','link_vector','variational'};
 
 vectors={};
 

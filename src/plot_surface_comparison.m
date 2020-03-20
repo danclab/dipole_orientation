@@ -9,7 +9,8 @@ for f = fieldnames(defaults)',
 end
 
 surfaces={'pial','white','white-pial'};
-methods={'ds surf norm','orig surf norm','link vector','variational'};
+methods={'ds surf norm','cps','orig surf norm','link vector','variational'};
+method_order=[1 5 2 3 4];
 
 dots_fvals=[];
 instr_fvals=[];
@@ -25,10 +26,10 @@ for surf_idx=1:length(surfaces)
         result_path=fullfile(result_path, 't1_surfs');
     end
     load(fullfile(result_path, 'dots_results.mat'));
-    dots_fvals(:,surf_idx,:)=results.fvals;
+    dots_fvals(:,surf_idx,:)=results.fvals(:,method_order);
     
     load(fullfile(result_path, 'instr_results.mat'));
-    instr_fvals(:,surf_idx,:)=results.fvals;
+    instr_fvals(:,surf_idx,:)=results.fvals(:,method_order);
 
     result_path=fullfile('../output',surface,'motor_erf');
     if params.mpm_surfs
@@ -37,7 +38,7 @@ for surf_idx=1:length(surfaces)
         result_path=fullfile(result_path, 't1_surfs');
     end
     load(fullfile(result_path, 'resp_results.mat'));
-    resp_fvals(:,surf_idx,:)=results.fvals;
+    resp_fvals(:,surf_idx,:)=results.fvals(:,method_order);
 end
 
 labels={};
@@ -66,8 +67,8 @@ for method_idx=1:length(methods)
     hold on;
     xlim([0 9]);
     plot(xlim(),[3 3],'k--');
-    %ylim([0 40]);
-    ylim([0 35]);
+    %ylim([0 20]);
+    ylim([0 30]);
     legend(surfaces);
     ylabel('\Delta F');
     title(methods{method_idx});
@@ -78,7 +79,7 @@ for method_idx=1:length(methods)
     hold on;
     xlim([0 9]);
     plot(xlim(),[3 3],'k--');
-    %ylim([0 12]);
+    %ylim([0 20]);
     ylim([0 15]);
     ylabel('\Delta F');
 
@@ -88,8 +89,7 @@ for method_idx=1:length(methods)
     hold on;
     xlim([0 9]);
     plot(xlim(),[3 3],'k--');
-    %ylim([0 50]);
-    ylim([0 20]);
+    ylim([0 30]);
     ylabel('\Delta F');
     xlabel('Participant');
 end

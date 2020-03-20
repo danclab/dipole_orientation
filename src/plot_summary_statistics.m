@@ -1,7 +1,7 @@
 function plot_summary_statistics()
 
 surfaces={'pial','white','white-pial'};
-methods={'ds surf norm','orig surf norm','link vector','variational'};
+methods={'ds surf norm','cps','orig surf norm','link vector','variational'};
 
 mpm_dots_fvals=[];
 t1_dots_fvals=[];
@@ -38,27 +38,27 @@ for surf_idx=1:length(surfaces)
     t1_resp_fvals(:,surf_idx,:)=results.fvals;
 end
 
-all_mpm_fvals=[reshape(mpm_dots_fvals,8,12) reshape(mpm_instr_fvals,8,12) reshape(mpm_resp_fvals,8,12)];
-all_t1_fvals=[reshape(t1_dots_fvals,8,12) reshape(t1_instr_fvals,8,12) reshape(t1_resp_fvals,8,12)];
+all_mpm_fvals=[reshape(mpm_dots_fvals,8,15) reshape(mpm_instr_fvals,8,15) reshape(mpm_resp_fvals,8,15)];
+all_t1_fvals=[reshape(t1_dots_fvals,8,15) reshape(t1_instr_fvals,8,15) reshape(t1_resp_fvals,8,15)];
 
 all_family=[];
-all_family.names={'ds-pial','ds-white','ds-combined','orig-pial','orig-white','orig-combined','link-pial','link-white','link-combined','var-pial','var-white','var-combined'};
+all_family.names={'ds-pial','ds-white','ds-combined','orig-pial','orig-white','orig-combined','link-pial','link-white','link-combined','var-pial','var-white','var-combined','cps-pial','cps-white','cps-combined'};
 all_family.infer='RFX';
-all_family.partition=[1 2 3 4 5 6 7 8 9 10 11 12 1 2 3 4 5 6 7 8 9 10 11 12 1 2 3 4 5 6 7 8 9 10 11 12];
+all_family.partition=[1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15];
 [family_all_mpm,~]=spm_compare_families(all_mpm_fvals,all_family);
 [family_all_t1,~]=spm_compare_families(all_t1_fvals,all_family);
 
 method_family=[];
-method_family.names={'ds','orig','link','var'};
+method_family.names={'ds','orig','link','var','cps'};
 method_family.infer='RFX';
-method_family.partition=[1 1 1 2 2 2 3 3 3 4 4 4 1 1 1 2 2 2 3 3 3 4 4 4 1 1 1 2 2 2 3 3 3 4 4 4];
+method_family.partition=[1 1 1 2 2 2 3 3 3 4 4 4 5 5 5 1 1 1 2 2 2 3 3 3 4 4 4 5 5 5 1 1 1 2 2 2 3 3 3 4 4 4 5 5 5];
 [family_methods_mpm,~]=spm_compare_families(all_mpm_fvals,method_family);
 [family_methods_t1,~]=spm_compare_families(all_t1_fvals,method_family);
 
 surf_family=[];
 surf_family.names={'pial','white','grey'};
 surf_family.infer='RFX';
-surf_family.partition=[1 2 3 1 2 3 1 2 3 1 2 3 1 2 3 1 2 3 1 2 3 1 2 3 1 2 3 1 2 3 1 2 3 1 2 3];
+surf_family.partition=[1 2 3 1 2 3 1 2 3 1 2 3 1 2 3 1 2 3 1 2 3 1 2 3 1 2 3 1 2 3 1 2 3 1 2 3 1 2 3 1 2 3 1 2 3];
 [family_surfs_mpm,~]=spm_compare_families(all_mpm_fvals,surf_family);
 [family_surfs_t1,~]=spm_compare_families(all_t1_fvals,surf_family);
 
@@ -66,7 +66,7 @@ surf_family.partition=[1 2 3 1 2 3 1 2 3 1 2 3 1 2 3 1 2 3 1 2 3 1 2 3 1 2 3 1 2
 figure;
 subplot(4,4,[5 6 7 9 10 11 13 14 15]);
 colormap(cbrewer('seq','Reds',100));
-imagesc(reshape(family_all_mpm.xp,3,4));
+imagesc(reshape(family_all_mpm.xp,3,5));
 originalSize = get(gca, 'Position');
 cb=colorbar();
 cb_position=get(cb,'Position');
@@ -109,7 +109,7 @@ ylim([0 1]);
 figure;
 subplot(4,4,[5 6 7 9 10 11 13 14 15]);
 colormap(cbrewer('seq','Reds',100));
-imagesc(reshape(family_all_t1.xp,3,4));
+imagesc(reshape(family_all_t1.xp,3,5));
 originalSize = get(gca, 'Position');
 cb=colorbar();
 cb_position=get(cb,'Position');

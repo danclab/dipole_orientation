@@ -9,8 +9,10 @@ for f = fieldnames(defaults)',
 end
 
 surfaces={'pial','white','white-pial'};
-
+methods={'ds_surf_norm','cps','orig_surf_norm','link_vector','variational'};
+method_order=[1 5 2 3 4];
 figure();
+colors=get(gca,'ColorOrder');
 
 for surf_idx=1:length(surfaces)
     surface=surfaces{surf_idx};
@@ -37,7 +39,7 @@ for surf_idx=1:length(surfaces)
     resp_results=results;
 
     labels={};
-    for subj_idx=1:length(dots_results.subjects)
+    for subj_idx=1:length(resp_results.subjects)
         labels{subj_idx}=sprintf('%d',subj_idx);
     end
 
@@ -53,30 +55,64 @@ for surf_idx=1:length(surfaces)
     end
 
     subplot(3,length(surfaces),surf_idx);
-    bar(dots_results.fvals);
+    hold all;
+    handles=[];
+    for m_idx=2:length(methods)
+        method=methods{m_idx};
+        mo_idx=find(strcmp(dots_results.methods,method));
+        for subj_idx=1:length(dots_results.subjects)
+            h=bar(subj_idx+((m_idx-1)-2)*.2-.1,dots_results.fvals(subj_idx,mo_idx),.2,'FaceColor',colors(m_idx,:));
+            if subj_idx==1
+                handles(end+1)=h;
+            end
+        end
+    end        
+    set(gca,'xtick',[1:length(dots_results.subjects)]);
     set(gca,'xticklabels',labels);
     hold on;
     plot(xlim(),[3 3],'k--');
     plot(xlim(),[-3 -3],'k--');
-    legend(dots_results.methods);
+    legend(handles,dots_results.methods(method_order(2:end)));
+    xlim([.5 length(dots_results.subjects)+.5]);
     ylim([-10 35]);
+    %ylim([-20 35]);
     ylabel('\Delta F');
 
     subplot(3,length(surfaces),length(surfaces)+surf_idx);
-    bar(instr_results.fvals);
+    hold all;
+    for m_idx=2:length(methods)
+        method=methods{m_idx};
+        mo_idx=find(strcmp(instr_results.methods,method));
+        for subj_idx=1:length(instr_results.subjects)
+            bar(subj_idx+((m_idx-1)-2)*.2-.1,instr_results.fvals(subj_idx,mo_idx),.2,'FaceColor',colors(m_idx,:));
+        end
+    end       
+    set(gca,'xtick',[1:length(instr_results.subjects)]);
     set(gca,'xticklabels',labels);
     hold on;
     plot(xlim(),[3 3],'k--');
     plot(xlim(),[-3 -3],'k--');
+    xlim([.5 length(instr_results.subjects)+.5]);
     ylim([-10 25]);
+    %ylim([-10 30]);
     ylabel('\Delta F');
 
     subplot(3,length(surfaces),2*length(surfaces)+surf_idx);
-    bar(resp_results.fvals);
+    hold all;
+    for m_idx=2:length(methods)
+        method=methods{m_idx};
+        mo_idx=find(strcmp(resp_results.methods,method));
+        for subj_idx=1:length(resp_results.subjects)
+            bar(subj_idx+((m_idx-1)-2)*.2-.1,resp_results.fvals(subj_idx,mo_idx),.2,'FaceColor',colors(m_idx,:));
+        end
+    end   
+    set(gca,'xtick',[1:length(resp_results.subjects)]);
     set(gca,'xticklabels',labels);
     hold on;
     plot(xlim(),[3 3],'k--');
     plot(xlim(),[-3 -3],'k--');
-    ylim([-20 15]);
+    xlim([.5 length(resp_results.subjects)+.5]);
+    %ylim([-45 20]);
+    ylim([-20 20]);
     ylabel('\Delta F');
 end
