@@ -1,9 +1,11 @@
-function f_val=invert_visual_erf_subject(subj_info, method, surface, surf_fname, stim, woi, varargin)
+function f_val=invert_visual_erf_subject(subj_info, method, surface,...
+    surf_fname, stim, woi, varargin)
 
 defaults = struct('base_dir','../data',...
-    'surf_dir', '../../beta_burst_layers/data/surf',... 
-    'mri_dir', '../../beta_burst_layers/data/mri',...
-    'mpm_surfs', true, 'patch_size', 5, 'n_temp_modes', 4, 'export', true);  %define default values
+    'surf_dir', '../../../inProgress/beta_burst_layers/data/surf',... 
+    'mri_dir', '../../../inProgress/beta_burst_layers/data/mri',...
+    'mpm_surfs', true, 'patch_size', 5, 'n_temp_modes', 4, 'export', true,...
+    'recompute_lgain',false,'cov_fname','','loc',false);  %define default values
 params = struct(varargin{:});
 for f = fieldnames(defaults)',  
     if ~isfield(params, f{1}),
@@ -35,7 +37,14 @@ spm_jobman('initcfg');
 [smoothkern]=spm_eeg_smoothmesh_mm(fullfile(subj_surf_dir,surf_fname), params.patch_size);
 
 % Coregistered filename
-coreg_fname=fullfile(data_dir, sprintf('%s_mp%s_rcinstr_Tafdf_%s.mat',surface,stim, method));
+base_fname=sprintf('%s_mp%s_rcinstr_Tafdf_%s.mat',surface,stim, method);
+if length(params.cov_fname)
+    base_fname=sprintf('cov_%s',base_fname);
+end
+if params.loc
+    base_fname=sprintf('loc_%s',base_fname);
+end
+coreg_fname=fullfile(data_dir, base_fname);
 
 % Coregister to mesh if not done already
 clear jobs
@@ -66,10 +75,18 @@ matlabbatch{batch_idx}.spm.meeg.source.headmodel.coregistration.coregspecify.fid
 matlabbatch{batch_idx}.spm.meeg.source.headmodel.coregistration.coregspecify.useheadshape = 0;
 matlabbatch{batch_idx}.spm.meeg.source.headmodel.forward.eeg = 'EEG BEM';
 matlabbatch{batch_idx}.spm.meeg.source.headmodel.forward.meg = 'Single Shell';            
+matlabbatch{batch_idx}.spm.meeg.source.headmodel.forward.loc = params.loc;
 spm_jobman('run', matlabbatch);    
 
+if ~params.recompute_lgain
+    D=spm_eeg_load(coreg_fname);
+    [path,fname,ext]=fileparts(coreg_fname);
+    D.inv{1}.gainmat = ['SPMgainmatrix_' fname '_1.mat'];
+    save(D);
+end
+
 % Setup spatial modes for cross validation
-spatialmodesname=fullfile(data_dir, 'testmodes.mat');    
+spatialmodesname=fullfile(data_dir, 'testmodes.mat');   
 [spatialmodesname,Nmodes,pctest]=spm_eeg_inv_prep_modes_xval(coreg_fname, [], spatialmodesname, 1, 0);
 
 clear jobs
@@ -84,6 +101,9 @@ matlabbatch{batch_idx}.spm.meeg.source.invertiter.isstandard.custom.invfunc = 'C
 matlabbatch{batch_idx}.spm.meeg.source.invertiter.isstandard.custom.invtype = 'EBB'; %;
 matlabbatch{batch_idx}.spm.meeg.source.invertiter.isstandard.custom.woi = woi;
 matlabbatch{batch_idx}.spm.meeg.source.invertiter.isstandard.custom.foi = [0 256];
+if length(params.cov_fname)>0
+    matlabbatch{batch_idx}.spm.meeg.source.invertiter.isstandard.custom.cov = {params.cov_fname};
+end
 matlabbatch{batch_idx}.spm.meeg.source.invertiter.isstandard.custom.hanning = 0;
 matlabbatch{batch_idx}.spm.meeg.source.invertiter.isstandard.custom.isfixedpatch.randpatch.npatches = 512;
 matlabbatch{batch_idx}.spm.meeg.source.invertiter.isstandard.custom.isfixedpatch.randpatch.niter = 1;

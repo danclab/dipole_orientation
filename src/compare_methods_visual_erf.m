@@ -1,7 +1,8 @@
 function compare_methods_visual_erf(subjects, stim, woi, surface, varargin)
 % stim=dots: -2400 - -2300
 % stim=instr: 100 - 200
-defaults = struct('surf_dir', '../../beta_burst_layers/data/surf','mpm_surfs',true);  %define default values
+defaults = struct('surf_dir', '../../../inProgress/beta_burst_layers/data/surf',...
+    'mpm_surfs',true,'cov_fname','','loc',false);  %define default values
 params = struct(varargin{:});
 for f = fieldnames(defaults)',  
     if ~isfield(params, f{1}),
@@ -9,7 +10,7 @@ for f = fieldnames(defaults)',
     end
 end
 
-methods={'ds_surf_norm','orig_surf_norm','link_vector','variational'};
+methods={'ds_surf_norm','orig_surf_norm','link_vector','variational','cps'};
 fvals=[];
 f_idx=1;
 
@@ -45,25 +46,19 @@ for subj_idx=1:length(subjects)
         if strcmp(surface,'white-pial')
             fwhm_orig_fname='FWHM5.00_white.ds-pial.ds';
         end
+        fwhm_fname=fullfile(subj_surf_dir,sprintf('%s.%s.mat',fwhm_orig_fname, methods{i}));
         if exist(fullfile(subj_surf_dir,sprintf('%s.mat', fwhm_orig_fname)),'file')==2
             copyfile(fullfile(subj_surf_dir,sprintf('%s.mat', fwhm_orig_fname)),...
-                fullfile(subj_surf_dir,sprintf('%s.%s.mat',fwhm_orig_fname, methods{i})));
+                fwhm_fname);
         end
         fvals(f_idx,i)=invert_visual_erf_subject(subj_info, methods{i}, surface, method_fname,...
-            stim, woi, 'surf_dir', params.surf_dir, 'mpm_surfs', params.mpm_surfs);
+            stim, woi, 'surf_dir', params.surf_dir, 'mpm_surfs', params.mpm_surfs,...
+            'recompute_lgain',true, 'cov_fname', params.cov_fname,'loc',params.loc,'export',~params.loc);
     end
-    fvals(f_idx,:)=fvals(f_idx,:)-fvals(f_idx,1);
     labels{f_idx}=sprintf('%d',subj_idx);
     f_idx=f_idx+1;
     
 end
-figure();bar(fvals);
-set(gca,'xticklabels',labels);
-hold on;
-legend(methods);
-ylabel('\Delta F');
-plot(xlim(),[3 3],'k--');
-ylabel('\Delta F');
 
 results=[];
 results.fvals=fvals;
@@ -79,4 +74,23 @@ if params.mpm_surfs
 else
     out_dir=fullfile(out_dir, 't1_surfs');
 end
-save(fullfile(out_dir, sprintf('%s_results.mat', stim)), 'results');
+out_file=sprintf('%s_results.mat', stim);
+if length(params.cov_fname)
+    out_file=sprintf('cov_%s', out_file);
+end
+if params.loc
+    out_file=sprintf('loc_%s', out_file);
+end
+save(fullfile(out_dir, out_file), 'results');
+
+fdiffs=[];
+for idx=1:size(results.fvals,1)
+    fdiffs(idx,:)=results.fvals(idx,:)-results.fvals(idx,1);
+end 
+figure();bar(fdiffs);
+set(gca,'xticklabels',labels);
+hold on;
+legend(methods);
+ylabel('\Delta F');
+plot(xlim(),[3 3],'k--');
+ylabel('\Delta F');
